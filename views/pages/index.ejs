@@ -3,3 +3,10 @@
 <% if(typeof page != 'undefined') { %>
 <p>Page: <%=page%></p>
 <% } %>
+
+
+<% if(typeof folderSizeList != 'undefined') { %>
+    <% for(let item of folderSizeList) { %>
+        <%= item.folder %> - size <%-(item.size * 0.001) %> KB<br>
+    <% } %>
+<% } %>

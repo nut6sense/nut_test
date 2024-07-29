@@ -2,18 +2,37 @@ const fs = require('fs');
 const path = require('path');
 
 const fileReader = async function (req, res) {
-    
+
     const folderMain = path.join(__dirname, '../public/wordFolderList');
     await deleteFolder(folderMain);
 
-    const filePath = path.join(__dirname, '../public', 'wordList', '20.txt');
+    const filePath = path.join(__dirname, '../public', 'wordList', '20k.txt');
+    await readFile(filePath);
 
-    fs.readFile(filePath, 'utf8', (err, data) => {
-        if (err) {
-            console.error('Error reading file:', err);
-            return;
+    const report = await getFolderSize(folderMain);
+    let folderSizeList = [];
+    report.filesList.forEach(file => {
+
+        let index = folderSizeList.findIndex(x => x.folder === `${file.folder}`);
+        if (index > -1) {
+            folderSizeList[index].size = ((+folderSizeList[index].size) + (+`${file.size}`));
+        } else {
+            folderSizeList.push(file)
         }
+    });
 
+    // console.log(folderSizeList);
+
+    res.render('pages/index', {
+        page: 'File Reader',
+        folderSizeList: folderSizeList,
+    })
+
+}
+
+const readFile = async (filePath) => {
+    try {
+        const data = fs.readFileSync(filePath, 'utf8');
         const lines = data.split('\n');
         const arrWords = [];
 
@@ -30,24 +49,20 @@ const fileReader = async function (req, res) {
             await createFile(folderPath, data.text);
         });
 
+        // console.log(arrWords);
 
-        console.log(arrWords);
-    });
-
-
-    res.render('pages/index', {
-        page : 'File Reader'
-    })
-
+    } catch (err) {
+        console.error('Error reading file:', err);
+    }
 }
 
 const createFolder = async (folderPath) => {
     if (fs.existsSync(folderPath)) {
-        console.log('Folder already exists:', folderPath);
+        // console.log('Folder already exists:', folderPath);
     } else {
         try {
             fs.mkdirSync(folderPath, { recursive: true });
-            console.log('Folders created successfully:', folderPath);
+            // console.log('Folders created successfully:', folderPath);
         } catch (err) {
             console.error('Error creating folders:', err);
         }
@@ -67,7 +82,7 @@ const createFile = async (folderPath, wordText) => {
 
     try {
         fs.writeFileSync(filePath, fileContent);
-        console.log('File created and text inserted successfully:', filePath);
+        // console.log('File created and text inserted successfully:', filePath);
     } catch (err) {
         console.error('Error writing file:', err);
     }
@@ -76,17 +91,44 @@ const createFile = async (folderPath, wordText) => {
 const deleteFolder = async (folderPath) => {
     try {
         fs.rmSync(folderPath, { recursive: true, force: true });
-        console.log('Folder deleted successfully:', folderPath);
-    } catch (err) {
-        console.error('Error deleting folder:', err);
+        // console.log('Folder deleted successfully:', folderPath);
         try {
             fs.mkdirSync(folderPath, { recursive: true });
-            console.log('Folders created successfully:', folderPath);
+            // console.log('Folders created successfully:', folderPath);
         } catch (err) {
             console.error('Error creating folders:', err);
         }
+    } catch (err) {
+        console.error('Error deleting folder:', err);
     }
 };
+
+const getFolderSize = async (dirPath) => {
+    let filesList = [];
+
+    const calculateSize = (currentPath) => {
+        const items = fs.readdirSync(currentPath);
+
+        items.forEach(item => {
+            const fullPath = path.join(currentPath, item);
+            const stats = fs.lstatSync(fullPath);
+
+            if (stats.isDirectory()) {
+                calculateSize(fullPath);
+            } else if (stats.isFile()) {
+                filesList.push({ path: currentPath, size: stats.size, folder: Array.from(item)[0] });
+            }
+        });
+    };
+
+    calculateSize(dirPath);
+
+    return {
+        filesList
+    };
+};
+
+
 
 module.exports = {
     fileReader
