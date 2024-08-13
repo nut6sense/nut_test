@@ -4,9 +4,53 @@
 <p>Page: <%=page%></p>
 <% } %>
 
+<table>
+    <tr>
+        <td>Folder</td>
+        <td>Size</td>
+        <td>Size (zip)</td>
+        <td>Different (%)</td>
+    </tr>
 
-<% if(typeof folderSizeList != 'undefined') { %>
-    <% for(let item of folderSizeList) { %>
-        <%= item.folder %> - size <%-(item.size * 0.001) %> KB<br>
+    <% if(typeof folderSizeList != 'undefined') { %>
+        <% for(let item of folderSizeList) { %>
+            <tr>
+                <td style="width: 100px; white-space: nowrap;"><%= item.folder %></td>
+                <td style="width: 150px; white-space: nowrap;"><%-(item.size * 0.001).toFixed(3) %> KB</td>
+                <td style="width: 150px; white-space: nowrap;"><%-(item.sizeZip * 0.001).toFixed(3) %> KB</td>
+                <td style="width: 150px; white-space: nowrap;"><%-(((item.size - item.sizeZip) / item.size) * 100).toFixed(2) %> %</td>
+            </tr>
+        <% } %>
     <% } %>
-<% } %>
+
+</table>
+
+
+<hr>
+<h4>ทดสอบ Query</h4>
+
+<label>7.1 มีคำกี่คำที่มีความยาว > 5 character</label><br>
+<label>Query</label><br>
+<p style="margin: 10px;"><%- resultQuery.query1 %></p>
+<label>Result</label><br>
+<p style="margin: 10px;"><%= resultQuery.result1[0].countCharLength %></p>
+<br>
+<label>7.2 มีคำกี่คำที่มีตัวอักษรซ้ำในคำมากกว่าหรือเท่ากับ 2 character</label><br>
+<label>Query</label><br>
+<p style="margin: 10px;"><%- resultQuery.query2 %></p>
+<label>Result</label><br>
+<p style="margin: 10px;"><%= resultQuery.result2[0].countDuplicate %></p>
+<br>
+<label>7.3 มีคำกี่คำที่ขึ้นต้นและลงท้ายด้วยตัวอักษรเดียวกัน</label><br>
+<label>Query</label><br>
+<p style="margin: 10px;"><%- resultQuery.query3 %></p>
+<label>Result</label><br>
+<p style="margin: 10px;"><%= resultQuery.result3[0].countMatchWord %></p>
+<br>
+<label>7.4 ให้สั่งอัพเดตคำที่มีทั้งหมดให้ตัวอักษรตัวแรกเป็นตัวพิมพ์ใหญ่</label><br>
+<label>Query</label><br>
+<p style="margin: 10px;"><%- resultQuery.query4 %></p>
+<label>Result</label><br>
+<p style="margin: 10px;"><%= resultQuery.result4.info %></p>
+
+

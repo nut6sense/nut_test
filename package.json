@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node app.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon app.js"
   },
@@ -11,8 +12,11 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "archiver": "^7.0.1",
     "ejs": "^3.1.10",
     "express": "^4.19.2",
-    "nodemon": "^3.1.4"
+    "mysql2": "^3.11.0",
+    "nodemon": "^3.1.4",
+    "pdfkit": "^0.15.0"
   }
 }
